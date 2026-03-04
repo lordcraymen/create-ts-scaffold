@@ -4,7 +4,8 @@
   "description": "Quickly scaffold TypeScript projects: npm package, SPA, CLI tool, or REST API server",
   "type": "module",
   "bin": {
-    "scaffold": "./bin/scaffold.js"
+    "scaffold": "./bin/scaffold.js",
+    "create-ts-scaffold": "./bin/scaffold.js"
   },
   "files": [
     "bin/",
