@@ -23,11 +23,11 @@
     "vite",
     "vitest"
   ],
-  "author": "",
+  "author": "Florian 'lordcraymen' Patzke",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/lordcraymen/scaffold.git"
   },
   "engines": {
     "node": ">=20"
