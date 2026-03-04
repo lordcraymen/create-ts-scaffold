@@ -1,0 +1,35 @@
+{
+  "name": "create-ts-scaffold",
+  "version": "0.1.0",
+  "description": "Quickly scaffold TypeScript projects: npm package, SPA, CLI tool, or REST API server",
+  "type": "module",
+  "bin": {
+    "scaffold": "./bin/scaffold.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "scaffold.sh"
+  ],
+  "keywords": [
+    "scaffold",
+    "typescript",
+    "boilerplate",
+    "generator",
+    "react",
+    "express",
+    "cli",
+    "npm-package",
+    "vite",
+    "vitest"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
