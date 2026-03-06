@@ -10,9 +10,10 @@
 #   spa       Single Page Application (React + Vite)
 #   cli       Command-line tool (tsup + commander)
 #   server    REST API server (Express), --ws for WebSocket support
+#   monorepo  Multi-package workspace (Turborepo + npm workspaces)
 #
 # Usage:
-#   ./scaffold.sh <type> <name> [--ws]
+#   ./scaffold.sh <type> <name> [--ws] [--packages name:type,...]
 #
 # Requires Node.js >= 20. Runs in bash >= 4 / Git Bash on Windows.
 set -euo pipefail
@@ -31,22 +32,27 @@ source "$SCRIPT_DIR/lib/common.sh"
 TYPE="${1:-}"
 NAME="${2:-}"
 WS_FLAG=false
+PACKAGES_SPEC=""
 
 [[ -z "$TYPE" || -z "$NAME" ]] && usage
 shift 2
 
-for arg in "$@"; do
-  case "$arg" in
-    --ws)      WS_FLAG=true ;;
-    -h|--help) usage ;;
-    *)         die "Unknown option: $arg" ;;
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --ws)          WS_FLAG=true; shift ;;
+    --packages)    PACKAGES_SPEC="${2:-}"; [[ -z "$PACKAGES_SPEC" ]] && die "--packages requires a value"; shift 2 ;;
+    --packages=*)  PACKAGES_SPEC="${1#--packages=}"; shift ;;
+    -h|--help)     usage ;;
+    *)             die "Unknown option: $1" ;;
   esac
 done
 
 # ── Validate ────────────────────────────────────────────────────────────
-[[ "$NAME" =~ ^[a-z0-9_-]+$ ]]             || die "Name must be lowercase alphanumeric (- or _ allowed)"
-[[ "$TYPE" =~ ^(package|spa|cli|server)$ ]] || die "Unknown type '$TYPE' – use: package, spa, cli, server"
-[[ "$WS_FLAG" == true && "$TYPE" != "server" ]] && die "--ws is only valid with the 'server' type"
+[[ "$NAME" =~ ^[a-z0-9_-]+$ ]]                      || die "Name must be lowercase alphanumeric (- or _ allowed)"
+[[ "$TYPE" =~ ^(package|spa|cli|server|monorepo)$ ]] || die "Unknown type '$TYPE' – use: package, spa, cli, server, monorepo"
+[[ "$WS_FLAG" == true && "$TYPE" != "server" ]]      && die "--ws is only valid with the 'server' type"
+[[ "$TYPE" == "monorepo" && -z "$PACKAGES_SPEC" ]]   && die "Monorepo requires --packages flag (e.g. --packages api:server,ui:spa)"
+[[ "$TYPE" != "monorepo" && -n "$PACKAGES_SPEC" ]]   && die "--packages is only valid with the 'monorepo' type"
 
 NODE_V=$(node -v 2>/dev/null | sed 's/v\([0-9]*\).*/\1/')
 [[ -n "$NODE_V" ]] || die "Node.js not found"
@@ -54,7 +60,14 @@ NODE_V=$(node -v 2>/dev/null | sed 's/v\([0-9]*\).*/\1/')
 [[ -e "$NAME" ]] && die "Directory '$NAME' already exists"
 
 # ── Load type-specific scaffold function ────────────────────────────────
-source "$SCRIPT_DIR/lib/types/${TYPE}.sh"
+if [[ "$TYPE" == "monorepo" ]]; then
+  for t in package spa cli server; do
+    source "$SCRIPT_DIR/lib/types/${t}.sh"
+  done
+  source "$SCRIPT_DIR/lib/types/monorepo.sh"
+else
+  source "$SCRIPT_DIR/lib/types/${TYPE}.sh"
+fi
 
 # ── Scaffold ────────────────────────────────────────────────────────────
 info "Scaffolding $TYPE project: $NAME"
@@ -94,6 +107,13 @@ case "$TYPE" in
     echo "  npm start          # run production build"
     echo "  npm test           # run tests"
     [[ "$WS_FLAG" == true ]] && echo "  WebSocket endpoint: ws://localhost:3000/ws"
+    ;;
+  monorepo)
+    echo "  npm run build      # build all packages"
+    echo "  npm run dev        # start all in dev mode"
+    echo "  npm test           # run all tests"
+    echo "  npm run lint       # lint all packages"
+    echo "  npm run format     # format all code"
     ;;
 esac
 

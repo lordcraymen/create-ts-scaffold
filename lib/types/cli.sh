@@ -5,7 +5,37 @@
 scaffold_cli() {
   mkdir -p src test
 
-  cat > package.json << JSON
+  if _is_workspace; then
+    cat > package.json << JSON
+{
+  "name": "$(_pkg_name)",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": { "$NAME": "./dist/index.js" },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/ test/",
+    "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "commander": "$COMMANDER"
+  },
+  "devDependencies": {
+    "@types/node": "$TYPES_NODE",
+    "tsup": "$TSUP",
+    "tsx": "$TSX",
+    "typescript": "$TS",
+    "vitest": "$VITEST"
+  }
+}
+JSON
+  else
+    cat > package.json << JSON
 {
   "name": "$NAME",
   "version": "0.1.0",
@@ -46,6 +76,7 @@ scaffold_cli() {
   }
 }
 JSON
+  fi
 
   write_tsconfig_node
 
@@ -61,9 +92,15 @@ export default defineConfig({
 TS
 
   write_vitest_node
-  write_eslint_node
-  write_prettierrc
-  write_gitignore
+
+  if _is_workspace; then
+    write_eslint_reexport
+  else
+    write_eslint_node
+    write_prettierrc
+    write_gitignore
+  fi
+
   write_readme "A TypeScript CLI tool"
 
   # src/cli.ts needs $NAME interpolation → unquoted heredoc

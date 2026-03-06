@@ -3,6 +3,13 @@
 # Functions that generate config files reused across project types.
 # Requires: $NAME (project name) and version variables from versions.sh.
 
+# ── Workspace mode helpers ──────────────────────────────────────────
+SCAFFOLD_MODE="${SCAFFOLD_MODE:-standalone}"
+PKG_JSON_NAME="${PKG_JSON_NAME:-}"
+
+_pkg_name() { echo "${PKG_JSON_NAME:-$NAME}"; }
+_is_workspace() { [[ "$SCAFFOLD_MODE" == "workspace" ]]; }
+
 write_prettierrc() {
   cat > .prettierrc << 'JSON'
 {
@@ -128,7 +135,22 @@ TS
 }
 
 write_tsconfig_node() {
-  cat > tsconfig.json << 'JSON'
+  if _is_workspace; then
+    cat > tsconfig.json << 'JSON'
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*.ts"]
+}
+JSON
+  else
+    cat > tsconfig.json << 'JSON'
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -150,6 +172,54 @@ write_tsconfig_node() {
   "include": ["src/**/*.ts"]
 }
 JSON
+  fi
+}
+
+write_tsconfig_base() {
+  cat > tsconfig.base.json << 'JSON'
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  }
+}
+JSON
+}
+
+write_turbo_json() {
+  cat > turbo.json << 'JSON'
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test": {
+      "dependsOn": ["build"]
+    },
+    "lint": {}
+  }
+}
+JSON
+}
+
+write_eslint_reexport() {
+  cat > eslint.config.js << 'JS'
+export { default } from '../../eslint.config.js';
+JS
 }
 
 # Shared post-scaffold steps: npm install, git init, husky

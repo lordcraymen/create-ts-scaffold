@@ -5,9 +5,70 @@
 scaffold_server() {
   mkdir -p src test
 
-  # ── package.json (varies by --ws flag) ──────────────────────────────
-  if [[ "$WS_FLAG" == true ]]; then
-    cat > package.json << JSON
+  # ── package.json (varies by --ws flag and workspace mode) ───────────
+  if _is_workspace; then
+    if [[ "$WS_FLAG" == true ]]; then
+      cat > package.json << JSON
+{
+  "name": "$(_pkg_name)",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/ test/",
+    "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'"
+  },
+  "dependencies": {
+    "express": "$EXPRESS",
+    "ws": "$WS_PKG"
+  },
+  "devDependencies": {
+    "@types/express": "$TYPES_EXPRESS",
+    "@types/node": "$TYPES_NODE",
+    "@types/ws": "$TYPES_WS",
+    "tsx": "$TSX",
+    "typescript": "$TS",
+    "vitest": "$VITEST"
+  }
+}
+JSON
+    else
+      cat > package.json << JSON
+{
+  "name": "$(_pkg_name)",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/ test/",
+    "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'"
+  },
+  "dependencies": {
+    "express": "$EXPRESS"
+  },
+  "devDependencies": {
+    "@types/express": "$TYPES_EXPRESS",
+    "@types/node": "$TYPES_NODE",
+    "tsx": "$TSX",
+    "typescript": "$TS",
+    "vitest": "$VITEST"
+  }
+}
+JSON
+    fi
+  else
+    if [[ "$WS_FLAG" == true ]]; then
+      cat > package.json << JSON
 {
   "name": "$NAME",
   "version": "0.1.0",
@@ -49,8 +110,8 @@ scaffold_server() {
   }
 }
 JSON
-  else
-    cat > package.json << JSON
+    else
+      cat > package.json << JSON
 {
   "name": "$NAME",
   "version": "0.1.0",
@@ -90,6 +151,7 @@ JSON
   }
 }
 JSON
+    fi
   fi
 
   # ── tsconfig.json ───────────────────────────────────────────────────
@@ -166,9 +228,14 @@ TS
 
   # ── Shared configs ──────────────────────────────────────────────────
   write_vitest_node
-  write_eslint_node
-  write_prettierrc
-  write_gitignore
+
+  if _is_workspace; then
+    write_eslint_reexport
+  else
+    write_eslint_node
+    write_prettierrc
+    write_gitignore
+  fi
 
   if [[ "$WS_FLAG" == true ]]; then
     write_readme "A TypeScript REST API server with WebSocket support"

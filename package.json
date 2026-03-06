@@ -1,7 +1,7 @@
 {
   "name": "create-ts-scaffold",
   "version": "0.1.0",
-  "description": "Quickly scaffold TypeScript projects: npm package, SPA, CLI tool, or REST API server",
+  "description": "Quickly scaffold TypeScript projects: npm package, SPA, CLI tool, REST API server, or monorepo",
   "type": "module",
   "bin": {
     "scaffold": "./bin/scaffold.js",
@@ -22,7 +22,10 @@
     "cli",
     "npm-package",
     "vite",
-    "vitest"
+    "vitest",
+    "monorepo",
+    "turborepo",
+    "workspaces"
   ],
   "author": "Florian 'lordcraymen' Patzke",
   "license": "MIT",

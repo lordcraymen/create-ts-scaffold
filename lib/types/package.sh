@@ -5,7 +5,40 @@
 scaffold_package() {
   mkdir -p src test
 
-  cat > package.json << JSON
+  if _is_workspace; then
+    cat > package.json << JSON
+{
+  "name": "$(_pkg_name)",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/ test/",
+    "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "tsup": "$TSUP",
+    "typescript": "$TS",
+    "vitest": "$VITEST"
+  }
+}
+JSON
+  else
+    cat > package.json << JSON
 {
   "name": "$NAME",
   "version": "0.1.0",
@@ -49,6 +82,7 @@ scaffold_package() {
   }
 }
 JSON
+  fi
 
   write_tsconfig_node
 
@@ -65,9 +99,15 @@ export default defineConfig({
 TS
 
   write_vitest_node
-  write_eslint_node
-  write_prettierrc
-  write_gitignore
+
+  if _is_workspace; then
+    write_eslint_reexport
+  else
+    write_eslint_node
+    write_prettierrc
+    write_gitignore
+  fi
+
   write_readme "A TypeScript npm package"
 
   cat > src/index.ts << 'TS'

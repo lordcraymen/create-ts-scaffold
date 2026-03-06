@@ -5,7 +5,43 @@
 scaffold_spa() {
   mkdir -p src test
 
-  cat > package.json << JSON
+  if _is_workspace; then
+    cat > package.json << JSON
+{
+  "name": "$(_pkg_name)",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/ test/",
+    "format": "prettier --write 'src/**/*.{ts,tsx}' 'test/**/*.{ts,tsx}'"
+  },
+  "dependencies": {
+    "react": "$REACT",
+    "react-dom": "$REACT_DOM"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "$TESTING_LIB_JEST_DOM",
+    "@testing-library/react": "$TESTING_LIB_REACT",
+    "@types/react": "$REACT",
+    "@types/react-dom": "$REACT_DOM",
+    "@vitejs/plugin-react": "$VITE_REACT",
+    "eslint-plugin-react-hooks": "$ESLINT_REACT_HOOKS",
+    "eslint-plugin-react-refresh": "$ESLINT_REACT_REFRESH",
+    "jsdom": "$JSDOM",
+    "typescript": "$TS",
+    "vite": "$VITE",
+    "vitest": "$VITEST"
+  }
+}
+JSON
+  else
+    cat > package.json << JSON
 {
   "name": "$NAME",
   "version": "0.1.0",
@@ -52,8 +88,38 @@ scaffold_spa() {
   }
 }
 JSON
+  fi
 
-  cat > tsconfig.json << 'JSON'
+  if _is_workspace; then
+    cat > tsconfig.json << 'JSON'
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+JSON
+
+    cat > tsconfig.node.json << 'JSON'
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "composite": true,
+    "outDir": "./dist-node"
+  },
+  "include": ["vite.config.ts", "vitest.config.ts"]
+}
+JSON
+  else
+    cat > tsconfig.json << 'JSON'
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -77,7 +143,7 @@ JSON
 }
 JSON
 
-  cat > tsconfig.node.json << 'JSON'
+    cat > tsconfig.node.json << 'JSON'
 {
   "compilerOptions": {
     "target": "ES2022",
@@ -94,6 +160,7 @@ JSON
   "include": ["vite.config.ts", "vitest.config.ts"]
 }
 JSON
+  fi
 
   cat > vite.config.ts << 'TS'
 import { defineConfig } from 'vite';
@@ -125,9 +192,14 @@ export default defineConfig({
 });
 TS
 
+  # SPA always gets its own eslint config (react rules)
   write_eslint_react
-  write_prettierrc
-  write_gitignore
+
+  if ! _is_workspace; then
+    write_prettierrc
+    write_gitignore
+  fi
+
   write_readme "A React single-page application"
 
   cat > index.html << HTML
