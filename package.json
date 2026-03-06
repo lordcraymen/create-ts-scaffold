@@ -1,6 +1,6 @@
 {
   "name": "create-ts-scaffold",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Quickly scaffold TypeScript projects: npm package, SPA, CLI tool, REST API server, or monorepo",
   "type": "module",
   "bin": {
