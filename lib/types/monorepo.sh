@@ -50,6 +50,7 @@ scaffold_monorepo() {
     "build": "turbo build",
     "dev": "turbo dev",
     "test": "turbo test",
+    "typecheck": "turbo typecheck",
     "lint": "turbo lint",
     "format": "prettier --write 'packages/*/src/**/*.{ts,tsx}' 'packages/*/test/**/*.{ts,tsx}'",
     "prepare": "husky"
@@ -137,7 +138,7 @@ MD
     local saved_name="$NAME"
     local saved_ws="$WS_FLAG"
     NAME="$pname"
-    PKG_JSON_NAME="@${workspace_name}/${pname}"
+    PKG_JSON_NAME="@${SCOPE:-${workspace_name}}/${pname}"
     WS_FLAG="$pws"
 
     "scaffold_${ptype}"

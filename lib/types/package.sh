@@ -26,6 +26,7 @@ scaffold_package() {
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "prepublishOnly": "npm run build"
@@ -40,7 +41,7 @@ JSON
   else
     cat > package.json << JSON
 {
-  "name": "$NAME",
+  "name": "$(_pkg_name)",
   "version": "0.1.0",
   "type": "module",
   "exports": {
@@ -58,6 +59,7 @@ JSON
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "prepublishOnly": "npm run build",
@@ -110,14 +112,31 @@ TS
 
   write_readme "A TypeScript npm package"
 
-  cat > src/index.ts << 'TS'
+  if _is_workspace; then
+    cat > src/index.ts << 'TS'
+// TODO: Add your package exports here
+export {};
+TS
+
+    cat > test/index.test.ts << 'TS'
+import { describe, it, expect } from 'vitest';
+
+describe('module', () => {
+  it('is importable', async () => {
+    const mod = await import('../src/index.js');
+    expect(mod).toBeDefined();
+  });
+});
+TS
+  else
+    cat > src/index.ts << 'TS'
 /** Add two numbers. */
 export function add(a: number, b: number): number {
   return a + b;
 }
 TS
 
-  cat > test/index.test.ts << 'TS'
+    cat > test/index.test.ts << 'TS'
 import { describe, it, expect } from 'vitest';
 import { add } from '../src/index.js';
 
@@ -127,4 +146,5 @@ describe('add', () => {
   });
 });
 TS
+  fi
 }

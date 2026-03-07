@@ -55,13 +55,24 @@ scaffold <type> <name> [options]
 |---|---|
 | `--ws` | Add WebSocket support (server type only) |
 | `--packages LIST` | Comma-separated packages as `name:type` (monorepo type only) |
+| `--scope SCOPE` | npm scope for package names (e.g. `--scope @myorg`) |
 | `-h`, `--help` | Show help |
+
+### Name
+
+Use `.` as the name to scaffold in the current directory (the directory's basename is used as the project name).
 
 ### Examples
 
 ```sh
 # Create an npm package
 scaffold package my-lib
+
+# Scaffold in the current directory
+scaffold package .
+
+# Create a scoped npm package (@myorg/my-lib)
+scaffold package my-lib --scope @myorg
 
 # Create a React SPA
 scaffold spa my-app
@@ -77,6 +88,9 @@ scaffold monorepo my-workspace --packages api:server,ui:spa,shared:package
 
 # Monorepo with server+WebSocket, SPA, package, and CLI
 scaffold monorepo my-workspace --packages api:server:ws,web:spa,utils:package,tools:cli
+
+# Monorepo with a custom scope (@myorg/api, @myorg/ui, etc.)
+scaffold monorepo my-workspace --scope @myorg --packages api:server,ui:spa,shared:package
 ```
 
 ## What you get
@@ -97,7 +111,7 @@ Monorepo projects additionally include:
 - **Turborepo** — Task orchestration with caching for build, test, and lint
 - **npm workspaces** — Dependency hoisting and cross-package linking
 - **Shared root configs** — ESLint, Prettier, and `tsconfig.base.json` shared across packages
-- **Scoped packages** — Each package is named `@workspace-name/package-name`
+- **Scoped packages** — Each package is named `@workspace-name/package-name` (customizable via `--scope`)
 
 ### Commands available in every project
 
@@ -105,6 +119,7 @@ Monorepo projects additionally include:
 npm run dev        # Start development (type-specific)
 npm run build      # Build for production
 npm test           # Run tests
+npm run typecheck  # Type-check with tsc --noEmit
 npm run lint       # Run ESLint
 npm run format     # Run Prettier
 ```
@@ -115,6 +130,7 @@ npm run format     # Run Prettier
 npm run build      # Build all packages (via Turborepo)
 npm run dev        # Start all packages in dev mode
 npm test           # Run all tests
+npm run typecheck  # Type-check all packages
 npm run lint       # Lint all packages
 npm run format     # Format all code
 ```

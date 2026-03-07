@@ -33,6 +33,8 @@ TYPE="${1:-}"
 NAME="${2:-}"
 WS_FLAG=false
 PACKAGES_SPEC=""
+SCOPE=""
+IN_PLACE=false
 
 [[ -z "$TYPE" || -z "$NAME" ]] && usage
 shift 2
@@ -42,10 +44,18 @@ while [[ $# -gt 0 ]]; do
     --ws)          WS_FLAG=true; shift ;;
     --packages)    PACKAGES_SPEC="${2:-}"; [[ -z "$PACKAGES_SPEC" ]] && die "--packages requires a value"; shift 2 ;;
     --packages=*)  PACKAGES_SPEC="${1#--packages=}"; shift ;;
+    --scope)       SCOPE="${2:-}"; [[ -z "$SCOPE" ]] && die "--scope requires a value"; SCOPE="${SCOPE#@}"; shift 2 ;;
+    --scope=*)     SCOPE="${1#--scope=}"; SCOPE="${SCOPE#@}"; shift ;;
     -h|--help)     usage ;;
     *)             die "Unknown option: $1" ;;
   esac
 done
+
+# ── Handle in-place scaffolding ─────────────────────────────────────────
+if [[ "$NAME" == "." ]]; then
+  IN_PLACE=true
+  NAME="$(basename "$PWD")"
+fi
 
 # ── Validate ────────────────────────────────────────────────────────────
 [[ "$NAME" =~ ^[a-z0-9_-]+$ ]]                      || die "Name must be lowercase alphanumeric (- or _ allowed)"
@@ -53,11 +63,12 @@ done
 [[ "$WS_FLAG" == true && "$TYPE" != "server" ]]      && die "--ws is only valid with the 'server' type"
 [[ "$TYPE" == "monorepo" && -z "$PACKAGES_SPEC" ]]   && die "Monorepo requires --packages flag (e.g. --packages api:server,ui:spa)"
 [[ "$TYPE" != "monorepo" && -n "$PACKAGES_SPEC" ]]   && die "--packages is only valid with the 'monorepo' type"
+[[ -n "$SCOPE" && ! "$SCOPE" =~ ^[a-z0-9_-]+$ ]]    && die "Scope must be lowercase alphanumeric (- or _ allowed)"
 
 NODE_V=$(node -v 2>/dev/null | sed 's/v\([0-9]*\).*/\1/')
 [[ -n "$NODE_V" ]] || die "Node.js not found"
 (( NODE_V >= NODE_MIN )) || die "Node >= $NODE_MIN required (found v$NODE_V)"
-[[ -e "$NAME" ]] && die "Directory '$NAME' already exists"
+[[ "$IN_PLACE" == false && -e "$NAME" ]] && die "Directory '$NAME' already exists"
 
 # ── Load type-specific scaffold function ────────────────────────────────
 if [[ "$TYPE" == "monorepo" ]]; then
@@ -69,10 +80,17 @@ else
   source "$SCRIPT_DIR/lib/types/${TYPE}.sh"
 fi
 
+# ── Compute package name ────────────────────────────────────────────────
+if [[ -n "$SCOPE" ]]; then
+  PKG_JSON_NAME="@${SCOPE}/${NAME}"
+fi
+
 # ── Scaffold ────────────────────────────────────────────────────────────
 info "Scaffolding $TYPE project: $NAME"
-mkdir -p "$NAME"
-cd "$NAME"
+if [[ "$IN_PLACE" == false ]]; then
+  mkdir -p "$NAME"
+  cd "$NAME"
+fi
 
 "scaffold_${TYPE}"
 finish_scaffold
@@ -81,7 +99,9 @@ finish_scaffold
 echo ""
 info "✓ $NAME is ready!"
 echo ""
-echo "  cd $NAME"
+if [[ "$IN_PLACE" == false ]]; then
+  echo "  cd $NAME"
+fi
 
 case "$TYPE" in
   package)

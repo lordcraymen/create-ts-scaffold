@@ -18,6 +18,7 @@ scaffold_spa() {
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.{ts,tsx}' 'test/**/*.{ts,tsx}'"
   },
@@ -43,7 +44,7 @@ JSON
   else
     cat > package.json << JSON
 {
-  "name": "$NAME",
+  "name": "$(_pkg_name)",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -53,6 +54,7 @@ JSON
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.{ts,tsx}' 'test/**/*.{ts,tsx}'",
     "prepare": "husky"
@@ -95,6 +97,7 @@ JSON
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "composite": false,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",

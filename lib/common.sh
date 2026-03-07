@@ -140,9 +140,6 @@ write_tsconfig_node() {
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "Node16",
-    "moduleResolution": "Node16",
-    "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": "./src"
   },
@@ -180,7 +177,11 @@ write_tsconfig_base() {
 {
   "compilerOptions": {
     "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "lib": ["ES2022"],
     "strict": true,
+    "composite": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -210,6 +211,7 @@ write_turbo_json() {
     "test": {
       "dependsOn": ["build"]
     },
+    "typecheck": {},
     "lint": {}
   }
 }

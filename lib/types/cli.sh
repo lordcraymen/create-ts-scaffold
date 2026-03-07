@@ -18,6 +18,7 @@ scaffold_cli() {
     "dev": "tsx src/index.ts",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "prepublishOnly": "npm run build"
@@ -37,7 +38,7 @@ JSON
   else
     cat > package.json << JSON
 {
-  "name": "$NAME",
+  "name": "$(_pkg_name)",
   "version": "0.1.0",
   "type": "module",
   "bin": { "$NAME": "./dist/index.js" },
@@ -47,6 +48,7 @@ JSON
     "dev": "tsx src/index.ts",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "prepublishOnly": "npm run build",

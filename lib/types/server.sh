@@ -20,6 +20,7 @@ scaffold_server() {
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'"
   },
@@ -50,6 +51,7 @@ JSON
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'"
   },
@@ -70,7 +72,7 @@ JSON
     if [[ "$WS_FLAG" == true ]]; then
       cat > package.json << JSON
 {
-  "name": "$NAME",
+  "name": "$(_pkg_name)",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -80,6 +82,7 @@ JSON
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "prepare": "husky"
@@ -113,7 +116,7 @@ JSON
     else
       cat > package.json << JSON
 {
-  "name": "$NAME",
+  "name": "$(_pkg_name)",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -123,6 +126,7 @@ JSON
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
     "prepare": "husky"
