@@ -15,7 +15,7 @@
 # Usage:
 #   ./scaffold.sh <type> <name> [--ws] [--packages name:type,...]
 #
-# Requires Node.js >= 20. Runs in bash >= 4 / Git Bash on Windows.
+# Requires the Node.js version defined in lib/versions.sh.
 set -euo pipefail
 
 # ── Resolve script directory (works with symlinks too) ──────────────────
@@ -65,9 +65,18 @@ fi
 [[ "$TYPE" != "monorepo" && -n "$PACKAGES_SPEC" ]]   && die "--packages is only valid with the 'monorepo' type"
 [[ -n "$SCOPE" && ! "$SCOPE" =~ ^[a-z0-9_-]+$ ]]    && die "Scope must be lowercase alphanumeric (- or _ allowed)"
 
-NODE_V=$(node -v 2>/dev/null | sed 's/v\([0-9]*\).*/\1/')
+NODE_V=$(node -v 2>/dev/null | sed 's/^v//')
 [[ -n "$NODE_V" ]] || die "Node.js not found"
-(( NODE_V >= NODE_MIN )) || die "Node >= $NODE_MIN required (found v$NODE_V)"
+node -e '
+  const parse = (version) => version.split(".").map(Number);
+  const current = parse(process.versions.node);
+  const minimum = parse(process.argv[1]);
+  const difference = minimum
+    .map((part, index) => (current[index] ?? 0) - part)
+    .find((part) => part !== 0);
+  const supported = difference === undefined || difference > 0;
+  process.exit(supported ? 0 : 1);
+' "$NODE_MIN" || die "Node >= $NODE_MIN required (found v$NODE_V)"
 [[ "$IN_PLACE" == false && -e "$NAME" ]] && die "Directory '$NAME' already exists"
 
 # ── Load type-specific scaffold function ────────────────────────────────

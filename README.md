@@ -16,7 +16,7 @@ One command gives you a fully configured project with **TypeScript**, **Vitest**
 
 ## Requirements
 
-- **Node.js >= 20**
+- **Node.js >= 22.22.2**
 - **Bash >= 4** (Linux/macOS) or **Git Bash** (Windows)
 
 ## Installation
@@ -99,7 +99,7 @@ Every generated project includes:
 
 - **TypeScript** — Strict mode, modern target
 - **Vitest** — Fast unit testing
-- **ESLint 9** — Flat config with TypeScript support
+- **ESLint 10** — Flat config with TypeScript support
 - **Prettier** — Consistent code formatting
 - **Husky + lint-staged** — Pre-commit hooks for linting and formatting
 - **Git** — Initialized repository with `.gitignore`
@@ -176,14 +176,14 @@ Dependencies are pinned to known-good versions for reproducible scaffolding. Key
 
 | Dependency | Version |
 |---|---|
-| TypeScript | 5.7.3 |
-| Vite | 7.0.0 |
-| Vitest | 4.0.18 |
-| React | 19.0.0 |
-| Express | 4.21.2 |
-| ESLint | 9.18.0 |
-| Prettier | 3.4.0 |
-| Turborepo | 2.3.6 |
+| TypeScript | 6.0.3 |
+| Vite | 8.2.0 |
+| Vitest | 4.1.10 |
+| React | 19.2.8 |
+| Express | 5.2.1 |
+| ESLint | 10.8.0 |
+| Prettier | 3.9.6 |
+| Turborepo | 2.10.8 |
 
 See [lib/versions.sh](lib/versions.sh) for the full list.
 

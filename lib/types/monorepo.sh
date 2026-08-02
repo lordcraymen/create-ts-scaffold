@@ -66,6 +66,7 @@ scaffold_monorepo() {
     "prettier": "$PRETTIER",
     "turbo": "$TURBO"
   },
+  "overrides": { "esbuild": "$ESBUILD" },
   "lint-staged": {
     "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
     "*.json": ["prettier --write"]

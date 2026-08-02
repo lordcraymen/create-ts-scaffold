@@ -141,7 +141,8 @@ write_tsconfig_node() {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "types": ["node"]
   },
   "include": ["src/**/*.ts"]
 }
@@ -155,6 +156,7 @@ JSON
     "moduleResolution": "Node16",
     "lib": ["ES2022"],
     "strict": true,
+    "ignoreDeprecations": "6.0",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -163,6 +165,7 @@ JSON
     "declarationMap": true,
     "sourceMap": true,
     "isolatedModules": true,
+    "types": ["node"],
     "outDir": "./dist",
     "rootDir": "./src"
   },
@@ -181,6 +184,7 @@ write_tsconfig_base() {
     "moduleResolution": "Node16",
     "lib": ["ES2022"],
     "strict": true,
+    "ignoreDeprecations": "6.0",
     "composite": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

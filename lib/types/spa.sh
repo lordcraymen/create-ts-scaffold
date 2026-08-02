@@ -29,8 +29,8 @@ scaffold_spa() {
   "devDependencies": {
     "@testing-library/jest-dom": "$TESTING_LIB_JEST_DOM",
     "@testing-library/react": "$TESTING_LIB_REACT",
-    "@types/react": "$REACT",
-    "@types/react-dom": "$REACT_DOM",
+    "@types/react": "$TYPES_REACT",
+    "@types/react-dom": "$TYPES_REACT_DOM",
     "@vitejs/plugin-react": "$VITE_REACT",
     "eslint-plugin-react-hooks": "$ESLINT_REACT_HOOKS",
     "eslint-plugin-react-refresh": "$ESLINT_REACT_REFRESH",
@@ -67,8 +67,8 @@ JSON
     "@eslint/js": "$ESLINT_JS",
     "@testing-library/jest-dom": "$TESTING_LIB_JEST_DOM",
     "@testing-library/react": "$TESTING_LIB_REACT",
-    "@types/react": "$REACT",
-    "@types/react-dom": "$REACT_DOM",
+    "@types/react": "$TYPES_REACT",
+    "@types/react-dom": "$TYPES_REACT_DOM",
     "@typescript-eslint/eslint-plugin": "$TS_ESLINT_PLUGIN",
     "@typescript-eslint/parser": "$TS_ESLINT_PARSER",
     "@vitejs/plugin-react": "$VITE_REACT",
@@ -84,6 +84,7 @@ JSON
     "vite": "$VITE",
     "vitest": "$VITEST"
   },
+  "overrides": { "esbuild": "$ESBUILD" },
   "lint-staged": {
     "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
     "*.json": ["prettier --write"]

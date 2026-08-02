@@ -107,6 +107,7 @@ JSON
     "typescript": "$TS",
     "vitest": "$VITEST"
   },
+  "overrides": { "esbuild": "$ESBUILD" },
   "lint-staged": {
     "*.ts": ["eslint --fix", "prettier --write"],
     "*.json": ["prettier --write"]
@@ -149,6 +150,7 @@ JSON
     "typescript": "$TS",
     "vitest": "$VITEST"
   },
+  "overrides": { "esbuild": "$ESBUILD" },
   "lint-staged": {
     "*.ts": ["eslint --fix", "prettier --write"],
     "*.json": ["prettier --write"]
